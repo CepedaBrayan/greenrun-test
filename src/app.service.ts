@@ -6,6 +6,7 @@ const prisma = new PrismaClient();
 export class AppService {
   async getHello(): Promise<string> {
     try {
+      if (!process.env.POSTGRESQL_DATABASE_URL) return 'Hello World!';
       let dbTest = await prisma.user.findUnique({
         where: {
           username: 'JohnDoe',

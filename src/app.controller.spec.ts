@@ -16,9 +16,7 @@ describe('AppController', () => {
 
   describe('root', () => {
     it('should return "Hello World!"', async () => {
-      expect(await appController.getHello()).toBe(
-        'Hello World for you, test admin! JohnDoe',
-      );
+      expect(await appController.getHello()).toContain('Hello World');
     });
   });
 });
