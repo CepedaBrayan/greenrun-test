@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRESQL_DATABASE_URL")
+}
+
+model user {
+  id              Int               @id @default(autoincrement())
+  role            String            @db.VarChar(10)
+  first_name      String            @db.VarChar(100)
+  last_name       String            @db.VarChar(100)
+  phone_number    String?           @db.VarChar(15)
+  email           String            @unique(map: "email") @db.VarChar(100)
+  username        String            @unique(map: "username") @db.VarChar(20)
+  password        String            @db.VarChar(100)
+  dni             String            @unique(map: "dni") @db.VarChar(20)
+  user_state      String            @default("active") @db.VarChar(20)
+  created_at      DateTime          @default(now()) @db.Timestamptz(0)
+  updated_at      DateTime          @default(now()) @db.Timestamptz(0)
+  deleted_at      DateTime?         @db.Timestamptz(0)
+  transaction     transaction[]
+  user_bet_option user_bet_option[]
+}
+
+model event {
+  id         Int       @id @default(autoincrement())
+  name       String    @db.VarChar(100)
+  date       DateTime  @db.Timestamptz(0)
+  created_at DateTime  @default(now()) @db.Timestamptz(0)
+  updated_at DateTime  @default(now()) @db.Timestamptz(0)
+  deleted_at DateTime? @db.Timestamptz(0)
+  bet        bet[]
+}
+
+model transaction {
+  id         Int       @id @default(autoincrement())
+  user_id    Int
+  amount     Float     @db.DoublePrecision
+  category   String    @db.VarChar(20)
+  status     String    @db.VarChar(20)
+  created_at DateTime  @default(now()) @db.Timestamptz(0)
+  updated_at DateTime  @default(now()) @db.Timestamptz(0)
+  deleted_at DateTime? @db.Timestamptz(0)
+  user       user      @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "user_id_fk")
+
+  @@index([user_id], map: "user_id")
+}
+
+model bet {
+  id         Int          @id @default(autoincrement())
+  event_id   Int
+  name       String       @db.VarChar(100)
+  created_at DateTime     @default(now()) @db.Timestamptz(0)
+  updated_at DateTime     @default(now()) @db.Timestamptz(0)
+  deleted_at DateTime?    @db.Timestamptz(0)
+  event      event        @relation(fields: [event_id], references: [id], onDelete: Cascade, map: "event_id_fk")
+  bet_option bet_option[]
+
+  @@index([event_id], map: "event_id")
+}
+
+model bet_option {
+  id              Int               @id @default(autoincrement())
+  bet_id          Int
+  option_number   Int               @db.SmallInt
+  option_name     String            @db.VarChar(100)
+  odd             Float             @db.DoublePrecision
+  created_at      DateTime          @default(now()) @db.Timestamptz(0)
+  updated_at      DateTime          @default(now()) @db.Timestamptz(0)
+  deleted_at      DateTime?         @db.Timestamptz(0)
+  bet             bet               @relation(fields: [bet_id], references: [id], onDelete: Cascade, map: "bet_id_fk")
+  user_bet_option user_bet_option[]
+
+  @@index([bet_id], map: "bet_id")
+}
+
+model user_bet_option {
+  id            Int        @id @default(autoincrement())
+  user_id       Int
+  bet_option_id Int
+  state         String     @db.VarChar(20)
+  amount        Float      @db.DoublePrecision
+  created_at    DateTime   @default(now()) @db.Timestamptz(0)
+  updated_at    DateTime   @default(now()) @db.Timestamptz(0)
+  deleted_at    DateTime?  @db.Timestamptz(0)
+  user          user       @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "user_id_fk")
+  bet_option    bet_option @relation(fields: [bet_option_id], references: [id], onDelete: Cascade, map: "bet_option_id_fk")
+
+  @@index([user_id], map: "user_id_bet_option_id")
+  @@index([bet_option_id], map: "bet_option_id")
+}
