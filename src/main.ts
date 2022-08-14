@@ -10,7 +10,7 @@ async function bootstrap() {
     .setTitle('GreenRun-sports')
     .setDescription('GreenRun sportsbook API')
     .setVersion('1.0')
-    .addTag('sportsbook')
+    .addTag('Sportsbook')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('apidoc', app, document);

@@ -7,7 +7,7 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  @ApiTags('setup')
+  @ApiTags('Setup')
   @ApiResponse({
     status: 200,
     description:
