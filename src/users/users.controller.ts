@@ -6,19 +6,21 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserClientDto } from './dto/create-user-client.dto';
+import { CreateUserAdminDto } from './dto/create-user-admin.dto';
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiOperation,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
-@Controller('clients')
+@Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post('/users')
+  @Post('/clients')
   @ApiOperation({ summary: 'Create user client' })
   @ApiTags('Users')
   @ApiCreatedResponse({
@@ -32,6 +34,28 @@ export class UsersController {
   createClient(@Body() createUserClientDto: CreateUserClientDto) {
     try {
       return this.usersService.createClient(createUserClientDto);
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
+
+  @Post('/admins')
+  @ApiOperation({ summary: 'Create user admin' })
+  @ApiTags('Users')
+  @ApiCreatedResponse({
+    description: 'User admin created',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'The auth code to create an admin is not valid',
+  })
+  @ApiBadRequestResponse({
+    description:
+      'An user with this {dni, username, email} already exists, try another one',
+  })
+  @ApiInternalServerErrorResponse()
+  createAdmin(@Body() createUserAdminDto: CreateUserAdminDto) {
+    try {
+      return this.usersService.createAdmin(createUserAdminDto);
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
