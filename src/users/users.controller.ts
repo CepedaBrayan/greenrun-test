@@ -18,11 +18,15 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { LocalAuthGuard } from 'src/auth/local-auth.guard';
+import { AuthService } from 'src/auth/auth.service';
 // import { AuthUserDto } from './dto/auth-user.dto';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private authService: AuthService,
+  ) {}
 
   @Post('/clients')
   @ApiOperation({ summary: 'Create user client' })
@@ -68,7 +72,7 @@ export class UsersController {
   @Post('auth/login')
   @UseGuards(LocalAuthGuard)
   async login(@Request() req) {
-    return req.user;
+    return this.authService.login(req.user);
   }
 
   // @Get()
