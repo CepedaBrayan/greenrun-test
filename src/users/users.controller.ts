@@ -5,6 +5,7 @@ import {
   Request,
   InternalServerErrorException,
   UseGuards,
+  Get,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserClientDto } from './dto/create-user-client.dto';
@@ -19,6 +20,7 @@ import {
 } from '@nestjs/swagger';
 import { LocalAuthGuard } from 'src/auth/local-auth.guard';
 import { AuthService } from 'src/auth/auth.service';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 // import { AuthUserDto } from './dto/auth-user.dto';
 
 @Controller('users')
@@ -73,6 +75,12 @@ export class UsersController {
   @UseGuards(LocalAuthGuard)
   async login(@Request() req) {
     return this.authService.login(req.user);
+  }
+
+  @Get('/profile')
+  @UseGuards(JwtAuthGuard)
+  async getProfile(@Request() req) {
+    return req.user;
   }
 
   // @Get()
