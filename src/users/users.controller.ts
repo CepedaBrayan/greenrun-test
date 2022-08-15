@@ -17,7 +17,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
+import { LocalAuthGuard } from 'src/auth/local-auth.guard';
 // import { AuthUserDto } from './dto/auth-user.dto';
 
 @Controller('users')
@@ -65,8 +65,8 @@ export class UsersController {
     }
   }
 
-  @UseGuards(AuthGuard('local'))
   @Post('auth/login')
+  @UseGuards(LocalAuthGuard)
   async login(@Request() req) {
     return req.user;
   }
