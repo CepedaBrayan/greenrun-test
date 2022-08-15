@@ -18,9 +18,9 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { LocalAuthGuard } from 'src/auth/local-auth.guard';
-import { AuthService } from 'src/auth/auth.service';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { LocalAuthGuard } from '../auth/local-auth.guard';
+import { AuthService } from '../auth/auth.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 // import { AuthUserDto } from './dto/auth-user.dto';
 
 @Controller('users')

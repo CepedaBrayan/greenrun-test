@@ -5,6 +5,8 @@ import { CreateUserClientDto } from '../dto/create-user-client.dto';
 import { CreateUserAdminDto } from '../dto/create-user-admin.dto';
 import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { hashPassword } from '../../utils/bcrypt';
+import { AuthModule } from '../../auth/auth.module';
+import { forwardRef } from '@nestjs/common';
 
 //working on with real database - and after delete
 import { PrismaClient } from '@prisma/client';
@@ -40,6 +42,7 @@ describe('UsersController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [forwardRef(() => AuthModule)],
       controllers: [UsersController],
       providers: [UsersService],
     }).compile();
