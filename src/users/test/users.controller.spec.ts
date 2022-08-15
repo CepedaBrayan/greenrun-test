@@ -4,6 +4,9 @@ import { UsersService } from '../users.service';
 import { CreateUserClientDto } from '../dto/create-user-client.dto';
 import { CreateUserAdminDto } from '../dto/create-user-admin.dto';
 import { BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { AuthService } from '../../auth/auth.service';
+import { hashPassword } from '../../utils/bcrypt';
+import { JwtService } from '@nestjs/jwt';
 
 //working on with real database - and after delete
 import { PrismaClient } from '@prisma/client';
@@ -15,10 +18,9 @@ const userClientExample: CreateUserClientDto = {
   phone_number: '12345678',
   email: 'JohnDoe123@example.ex',
   username: 'JohnDoe123',
-  password: '12345678pass',
+  password: '',
   dni: 'example123',
 };
-
 const userAdminExample: CreateUserAdminDto = {
   auth_code: String(process.env.AUTH_CODE_CREATE_ADMIN),
   first_name: 'JohnAdmin2',
@@ -26,8 +28,13 @@ const userAdminExample: CreateUserAdminDto = {
   phone_number: '12345678',
   email: 'JohnDoeAdmin2@example.ex',
   username: 'JohnDoeAdmin2',
-  password: '12345678pass',
+  password: '',
   dni: 'example123Admin2',
+};
+
+const hashingExamples = async () => {
+  userClientExample.password = await hashPassword('12345678pass');
+  userAdminExample.password = await hashPassword('12345678pass');
 };
 
 describe('UsersController', () => {
@@ -36,7 +43,7 @@ describe('UsersController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UsersController],
-      providers: [UsersService],
+      providers: [UsersService, AuthService, JwtService],
     }).compile();
 
     controller = module.get<UsersController>(UsersController);
@@ -56,7 +63,7 @@ describe('UsersController', () => {
           last_name: 'Doe',
           email: 'John2Doe2@mail.com',
           username: 'JohnDoe',
-          password: '123456',
+          password: await hashPassword('123456'),
           dni: '123456789',
           user_state: 'active',
         },
@@ -77,7 +84,7 @@ describe('UsersController', () => {
           last_name: 'Doe',
           email: 'John2DoeAdmin@mail.com',
           username: 'JohnDoeAdmin',
-          password: '123456',
+          password: await hashPassword('123456'),
           dni: '123456789admin',
           user_state: 'active',
         },

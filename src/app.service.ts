@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
+import { hashPassword } from './utils/bcrypt';
 
 const prisma = new PrismaClient();
 
@@ -9,7 +10,7 @@ export class AppService {
     if (!process.env.POSTGRESQL_DATABASE_URL) return 'Hello World!';
     let dbTest = await prisma.user.findUnique({
       where: {
-        username: 'JohnDoe',
+        username: 'JohnDoeAdmin',
       },
     });
     if (!dbTest) {
@@ -20,7 +21,7 @@ export class AppService {
           last_name: 'Doe',
           email: 'John2DoeAdmin@mail.com',
           username: 'JohnDoeAdmin',
-          password: '123456',
+          password: await hashPassword('123456'),
           dni: '123456789admin',
           user_state: 'active',
         },

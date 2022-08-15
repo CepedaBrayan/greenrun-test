@@ -25,9 +25,9 @@ describe('AppController', () => {
   });
 
   describe('database connection', () => {
-    it('should return "Hello World for you, test admin! JohnDoe"', async () => {
+    it('should return "Hello World for you, test admin! JohnDoeAdmin"', async () => {
       expect(await appController.getHello()).toBe(
-        'Hello World for you, test admin! JohnDoe',
+        'Hello World for you, test admin! JohnDoeAdmin',
       );
     });
   });
