@@ -21,7 +21,7 @@ export class AppService {
           last_name: 'Doe',
           email: 'John2DoeAdmin@mail.com',
           username: 'JohnDoeAdmin',
-          password: await hashPassword('123456'),
+          password: await hashPassword('12345678'),
           dni: '123456789admin',
           user_state: 'active',
         },

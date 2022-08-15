@@ -3,7 +3,6 @@ import {
   Post,
   Body,
   InternalServerErrorException,
-  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserClientDto } from './dto/create-user-client.dto';
@@ -16,8 +15,8 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { LocalAuthGuard } from '../auth/local-auth.guard';
 import { AuthService } from '../auth/auth.service';
+import { AuthUserDto } from './dto/auth-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -68,9 +67,9 @@ export class UsersController {
   }
 
   @Post('auth/login')
-  @UseGuards(LocalAuthGuard)
-  async login(@Body() user: any) {
-    return this.authservice.login(user);
+  // @UseGuards(LocalAuthGuard)
+  async login(@Body() authUserDto: AuthUserDto) {
+    return this.authservice.login(authUserDto);
   }
 
   // @Get()

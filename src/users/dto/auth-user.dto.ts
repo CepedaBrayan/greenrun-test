@@ -4,7 +4,7 @@ import { IsNotEmpty, IsString, Length } from 'class-validator';
 export class AuthUserDto {
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({ example: 'JhonDoe' })
+  @ApiProperty({ example: 'JhonDoeAdmin' })
   username: string;
 
   @IsString()
