@@ -69,6 +69,7 @@ export class UsersController {
   @Post('auth/login')
   // @UseGuards(LocalAuthGuard)
   async login(@Body() authUserDto: AuthUserDto) {
+    console.log('in1');
     return this.authservice.login(authUserDto);
   }
 
