@@ -19,6 +19,15 @@ export class AuthService {
     return null;
   }
 
+  async findUser(username: string) {
+    const user = await this.usersService.findOne(username);
+    if (user) {
+      const { password, ...result } = user;
+      return result;
+    }
+    return null;
+  }
+
   async login(user: any) {
     const payload = { username: user.username, sub: user.id };
     return {
