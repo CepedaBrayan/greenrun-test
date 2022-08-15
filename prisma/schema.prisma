@@ -10,6 +10,12 @@ datasource db {
   url      = env("POSTGRESQL_DATABASE_URL")
 }
 
+model auth {
+  id        Int    @id
+  auth_name String @unique(map: "auth_name") @db.VarChar(50)
+  code      String @db.VarChar(50)
+}
+
 model user {
   id              Int               @id @default(autoincrement())
   role            String            @db.VarChar(10)
