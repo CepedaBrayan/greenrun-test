@@ -18,10 +18,10 @@ export class AppService {
           role: 'admin',
           first_name: 'John',
           last_name: 'Doe',
-          email: 'John2Doe2@mail.com',
-          username: 'JohnDoe',
+          email: 'John2DoeAdmin@mail.com',
+          username: 'JohnDoeAdmin',
           password: '123456',
-          dni: '123456789',
+          dni: '123456789admin',
           user_state: 'active',
         },
       });
