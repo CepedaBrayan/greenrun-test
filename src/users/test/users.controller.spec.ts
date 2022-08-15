@@ -33,7 +33,8 @@ const userAdminExample: CreateUserAdminDto = {
   dni: 'example123Admin2',
 };
 
-const hashingExamples = async () => {
+// hashingExamples
+async () => {
   userClientExample.password = await hashPassword('12345678pass');
   userAdminExample.password = await hashPassword('12345678pass');
 };

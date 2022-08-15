@@ -2,10 +2,10 @@ import {
   Controller,
   Post,
   Body,
-  Request,
   InternalServerErrorException,
   UseGuards,
   Get,
+  Req,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserClientDto } from './dto/create-user-client.dto';
@@ -15,6 +15,7 @@ import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
+  ApiOkResponse,
   ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -95,8 +96,17 @@ export class UsersController {
 
   @Get('/profile')
   @UseGuards(JwtAuthGuard)
-  async getProfile(@Request() req) {
-    return req.user;
+  @ApiOperation({ summary: 'Get user profile' })
+  @ApiTags('Users')
+  @ApiOkResponse({ description: 'Object with user data' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiInternalServerErrorResponse()
+  async getProfile(@Req() req) {
+    try {
+      return this.authService.findUser(req.user.username);
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
   }
 
   // @Get()
