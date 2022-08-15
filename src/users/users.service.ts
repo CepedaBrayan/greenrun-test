@@ -136,12 +136,17 @@ export class UsersService {
     return { message: 'User admin created' };
   }
 
+  async findOne(username: string) {
+    const user = await prisma.user.findUnique({
+      where: {
+        username: username,
+      },
+    });
+    return user;
+  }
+
   // findAll() {
   //   return `This action returns all users`;
-  // }
-
-  // findOne(id: number) {
-  //   return `This action returns a #${id} user`;
   // }
 
   // update(id: number, updateUserDto: UpdateUserDto) {

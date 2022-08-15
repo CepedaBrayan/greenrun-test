@@ -2,7 +2,9 @@ import {
   Controller,
   Post,
   Body,
+  Request,
   InternalServerErrorException,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserClientDto } from './dto/create-user-client.dto';
@@ -15,15 +17,12 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { AuthService } from '../auth/auth.service';
-import { AuthUserDto } from './dto/auth-user.dto';
+import { AuthGuard } from '@nestjs/passport';
+// import { AuthUserDto } from './dto/auth-user.dto';
 
 @Controller('users')
 export class UsersController {
-  constructor(
-    private readonly usersService: UsersService,
-    private authservice: AuthService,
-  ) {}
+  constructor(private readonly usersService: UsersService) {}
 
   @Post('/clients')
   @ApiOperation({ summary: 'Create user client' })
@@ -66,10 +65,10 @@ export class UsersController {
     }
   }
 
+  @UseGuards(AuthGuard('local'))
   @Post('auth/login')
-  // @UseGuards(LocalAuthGuard)
-  async login(@Body() authUserDto: AuthUserDto) {
-    return this.authservice.login(authUserDto);
+  async login(@Request() req) {
+    return req.user;
   }
 
   // @Get()
