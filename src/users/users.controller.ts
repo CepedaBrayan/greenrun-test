@@ -10,6 +10,7 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserClientDto } from './dto/create-user-client.dto';
 import { CreateUserAdminDto } from './dto/create-user-admin.dto';
+import { LoginUserDto } from './dto/login-user.dto';
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
@@ -73,8 +74,23 @@ export class UsersController {
 
   @Post('auth/login')
   @UseGuards(LocalAuthGuard)
-  async login(@Request() req) {
-    return this.authService.login(req.user);
+  @ApiOperation({ summary: 'Login for clients and admins' })
+  @ApiTags('Users')
+  @ApiCreatedResponse({
+    description: '"access_token" : "JWT"',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Invalid credentials',
+  })
+  @ApiInternalServerErrorResponse()
+  async login(@Body() loginUserDto: LoginUserDto) {
+    try {
+      return this.authService.login(
+        await this.usersService.findOne(loginUserDto.username),
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
   }
 
   @Get('/profile')

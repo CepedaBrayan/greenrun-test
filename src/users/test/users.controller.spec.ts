@@ -3,6 +3,7 @@ import { UsersController } from '../users.controller';
 import { UsersService } from '../users.service';
 import { CreateUserClientDto } from '../dto/create-user-client.dto';
 import { CreateUserAdminDto } from '../dto/create-user-admin.dto';
+import { LoginUserDto } from '../dto/login-user.dto';
 import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { hashPassword } from '../../utils/bcrypt';
 import { AuthModule } from '../../auth/auth.module';
@@ -187,6 +188,47 @@ describe('UsersController', () => {
         await controller.createClient(userAdminExample2);
       } catch (error) {
         expect(error).toBeInstanceOf(BadRequestException);
+      }
+    });
+  });
+
+  describe('users/login', () => {
+    it('should login a user client', async () => {
+      const loginUserDto: LoginUserDto = {
+        username: userClientExample.username,
+        password: userClientExample.password,
+      };
+      const result = await controller.login(loginUserDto);
+      expect(result.access_token).toBeDefined();
+    });
+    it('should unauthorized login a user client', async () => {
+      const loginUserDto: LoginUserDto = {
+        username: userClientExample.username,
+        password: 'wrongPassword',
+      };
+      try {
+        await controller.login(loginUserDto);
+      } catch (error) {
+        expect(error).toBeInstanceOf(UnauthorizedException);
+      }
+    });
+    it('should login a user admin', async () => {
+      const loginUserDto: LoginUserDto = {
+        username: userAdminExample.username,
+        password: userAdminExample.password,
+      };
+      const result = await controller.login(loginUserDto);
+      expect(result.access_token).toBeDefined();
+    });
+    it('should unauthorized login a user admin', async () => {
+      const loginUserDto: LoginUserDto = {
+        username: userAdminExample.username,
+        password: 'wrongPassword',
+      };
+      try {
+        await controller.login(loginUserDto);
+      } catch (error) {
+        expect(error).toBeInstanceOf(UnauthorizedException);
       }
     });
   });
