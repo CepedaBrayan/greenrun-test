@@ -100,7 +100,7 @@ describe('UsersController', () => {
   });
 
   describe('users/clients', () => {
-    it('should create a user client', async () => {
+    it('should create an user client', async () => {
       const result = await controller.createClient(userClientExample);
       await prisma.user.delete({
         where: {
@@ -142,7 +142,7 @@ describe('UsersController', () => {
   });
 
   describe('users/admins', () => {
-    it('should create a user admin', async () => {
+    it('should create an user admin', async () => {
       const result = await controller.createAdmin(userAdminExample);
       await prisma.user.delete({
         where: {
@@ -152,7 +152,7 @@ describe('UsersController', () => {
       expect(result).toStrictEqual({ message: 'User admin created' });
     });
 
-    it('should return a unauthorized error if the auth code is wrong', async () => {
+    it('should return an unauthorized error if the auth code is wrong', async () => {
       const userAdminExample2: CreateUserAdminDto = userAdminExample;
       userAdminExample2.auth_code = 'wrongs';
       try {
@@ -194,7 +194,7 @@ describe('UsersController', () => {
   });
 
   describe('users/login', () => {
-    it('should login a user client', async () => {
+    it('should login an user client', async () => {
       const loginUserDto: LoginUserDto = {
         username: userClientExample.username,
         password: userClientExample.password,
@@ -202,7 +202,7 @@ describe('UsersController', () => {
       const result = await controller.login(loginUserDto);
       expect(result.access_token).toBeDefined();
     });
-    it('should unauthorized login a user client', async () => {
+    it('should unauthorized login an user client', async () => {
       const loginUserDto: LoginUserDto = {
         username: userClientExample.username,
         password: 'wrongPassword',
@@ -213,7 +213,7 @@ describe('UsersController', () => {
         expect(error).toBeInstanceOf(UnauthorizedException);
       }
     });
-    it('should login a user admin', async () => {
+    it('should login an user admin', async () => {
       const loginUserDto: LoginUserDto = {
         username: userAdminExample.username,
         password: userAdminExample.password,
@@ -221,13 +221,67 @@ describe('UsersController', () => {
       const result = await controller.login(loginUserDto);
       expect(result.access_token).toBeDefined();
     });
-    it('should unauthorized login a user admin', async () => {
+    it('should unauthorized login an user admin', async () => {
       const loginUserDto: LoginUserDto = {
         username: userAdminExample.username,
         password: 'wrongPassword',
       };
       try {
         await controller.login(loginUserDto);
+      } catch (error) {
+        expect(error).toBeInstanceOf(UnauthorizedException);
+      }
+    });
+  });
+
+  describe('users/profile', () => {
+    it('should return a profile for an user client', async () => {
+      const loginUserDto: LoginUserDto = {
+        username: userClientExample.username,
+        password: userClientExample.password,
+      };
+      const result = await controller.login(loginUserDto);
+      const headersRequest = {
+        Authorization: `Bearer ${result.access_token}`,
+      };
+      const profile = await controller.getProfile({ headers: headersRequest });
+      expect(profile).toBeDefined();
+    });
+    it('should unauthorized profile for an user client', async () => {
+      const loginUserDto: LoginUserDto = {
+        username: userClientExample.username,
+        password: userClientExample.password,
+      };
+      const result = await controller.login(loginUserDto);
+      try {
+        await controller.getProfile({
+          Headers: { Bearer: result.access_token },
+        });
+      } catch (error) {
+        expect(error).toBeInstanceOf(UnauthorizedException);
+      }
+    });
+    it('should return a profile for an user admin', async () => {
+      const loginUserDto: LoginUserDto = {
+        username: userAdminExample.username,
+        password: userAdminExample.password,
+      };
+      const result = await controller.login(loginUserDto);
+      const profile = await controller.getProfile({
+        Headers: { Bearer: result.access_token },
+      });
+      expect(profile).toBeDefined();
+    });
+    it('should unauthorized profile for an user admin', async () => {
+      const loginUserDto: LoginUserDto = {
+        username: userAdminExample.username,
+        password: userAdminExample.password,
+      };
+      const result = await controller.login(loginUserDto);
+      try {
+        await controller.getProfile({
+          Headers: { Bearer: result.access_token },
+        });
       } catch (error) {
         expect(error).toBeInstanceOf(UnauthorizedException);
       }
