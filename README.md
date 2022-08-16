@@ -24,12 +24,39 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Greenrun-test is an API-RESTful developed in [Nest](https://github.com/nestjs/nest) v16.13.1, using a [Node](https://nodejs.org/es/) v16.13.1, with a microservices software model and following the SOLID and DRY principles, using [Jest](https://jestjs.io) for unit testing and JWT for access auth.
+Greenrun-test is deployed in [Heroku](https://id.heroku.com/login) both the backend and the database, that is a [PostgreSQL](https://www.postgresql.org/) database, which is connected with the backend through [Prisma](https://www.prisma.io) as ORM tool.
+This App wass deployed automatically by CI/CD workflows (CI: GitHub Actions, CD: Heroku auto deployment), using the MASTER branch for it deploy, using too GitHub repo secrets.
+
+## URLS
+
+```bash
+# local
+http://localhost:3000/api/
+
+# deploy
+http://localhost:3000/apidoc/
+```
 
 ## Installation
 
 ```bash
+# install dependencies
 $ npm install
+
+# build the project
+$ npm run build
+```
+
+## Environment vars needed
+
+```bash
+# set environment variables
+PORT
+POSTGRESQL_DATABASE_URL
+BCRYPT_SALT_ROUNDS
+AUTH_CODE_CREATE_ADMIN
+JWT_SECRET_KEY
 ```
 
 ## Running the app
@@ -51,18 +78,30 @@ $ npm run start:prod
 # unit tests
 $ npm run test
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
 ```
 
-## Support
+## DOCUMENTATION
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+This application is documented using [Swagger](https://swagger.io/), you can also look de docs in both environments:
 
-## Stay in touch
+```bash
+# local
+http://localhost:3000/apidoc/
+
+# deploy
+https://greenrun-sports-backend.herokuapp.com/apidoc/
+
+```
+
+And also there is a [Insomnia](https://insomnia.rest/) collection to test the API manually (there are both environments in itself: local and deploy, setup the vars before to test), that it's in
+
+```bash
+# collection file
+root/Insomnia API/ Insomnia_2022-08-09.json
+
+```
+
+## FRAMEWORK SOURCE: Stay in touch
 
 - Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
 - Website - [https://nestjs.com](https://nestjs.com/)
