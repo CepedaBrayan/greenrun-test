@@ -4,14 +4,22 @@ import { UsersService } from '../users.service';
 import { CreateUserClientDto } from '../dto/create-user-client.dto';
 import { CreateUserAdminDto } from '../dto/create-user-admin.dto';
 import { LoginUserDto } from '../dto/login-user.dto';
-import { BadRequestException, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  UnauthorizedException,
+  forwardRef,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { hashPassword } from '../../utils/bcrypt';
 import { AuthModule } from '../../auth/auth.module';
-import { forwardRef } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 
 //working on with real database - and after delete
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
+
+// starting JwtService
+const jwtService = new JwtService();
 
 const userClientExample: CreateUserClientDto = {
   first_name: 'John',
@@ -241,25 +249,10 @@ describe('UsersController', () => {
         password: userClientExample.password,
       };
       const result = await controller.login(loginUserDto);
-      const headersRequest = {
-        Authorization: `Bearer ${result.access_token}`,
-      };
-      const profile = await controller.getProfile({ headers: headersRequest });
-      expect(profile).toBeDefined();
-    });
-    it('should unauthorized profile for an user client', async () => {
-      const loginUserDto: LoginUserDto = {
-        username: userClientExample.username,
-        password: userClientExample.password,
-      };
-      const result = await controller.login(loginUserDto);
-      try {
-        await controller.getProfile({
-          Headers: { Bearer: result.access_token },
-        });
-      } catch (error) {
-        expect(error).toBeInstanceOf(UnauthorizedException);
-      }
+      const decoded: any = jwtService.decode(result.access_token);
+      const payload = { user: { username: decoded.username } };
+      const profile: any = await controller.getProfile(payload);
+      expect(profile.username).toEqual(userClientExample.username);
     });
     it('should return a profile for an user admin', async () => {
       const loginUserDto: LoginUserDto = {
@@ -267,23 +260,17 @@ describe('UsersController', () => {
         password: userAdminExample.password,
       };
       const result = await controller.login(loginUserDto);
-      const profile = await controller.getProfile({
-        Headers: { Bearer: result.access_token },
-      });
-      expect(profile).toBeDefined();
+      const decoded: any = jwtService.decode(result.access_token);
+      const payload = { user: { username: decoded.username } };
+      const profile: any = await controller.getProfile(payload);
+      expect(profile.username).toEqual(userAdminExample.username);
     });
-    it('should unauthorized profile for an user admin', async () => {
-      const loginUserDto: LoginUserDto = {
-        username: userAdminExample.username,
-        password: userAdminExample.password,
-      };
-      const result = await controller.login(loginUserDto);
+    it('should unauthorized profile for an user', async () => {
+      const payload = { user: { username: 'wrong username' } };
       try {
-        await controller.getProfile({
-          Headers: { Bearer: result.access_token },
-        });
+        await controller.getProfile(payload);
       } catch (error) {
-        expect(error).toBeInstanceOf(UnauthorizedException);
+        expect(error).toBeInstanceOf(InternalServerErrorException);
       }
     });
   });
