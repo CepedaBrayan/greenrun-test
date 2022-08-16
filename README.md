@@ -55,8 +55,9 @@ $ npm run build
 PORT
 POSTGRESQL_DATABASE_URL
 BCRYPT_SALT_ROUNDS
-AUTH_CODE_CREATE_ADMIN
+AUTH_CODE_CREATE_ADMIN = 945790 !also use it to test the register admin endpoint
 JWT_SECRET_KEY
+
 ```
 
 ## Running the app
