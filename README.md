@@ -24,7 +24,7 @@
 
 ## Description
 
-Greenrun-test is an API-RESTful developed in [Nest](https://github.com/nestjs/nest) v16.13.1, using a [Node](https://nodejs.org/es/) v16.13.1, with a microservices software model and following the SOLID and DRY principles, using [Jest](https://jestjs.io) for unit testing and JWT for access auth.
+Greenrun-test is an API-RESTful developed in [Nest](https://github.com/nestjs/nest) v16.13.1, using a [Node](https://nodejs.org/es/) v16.13.1, with a microservices software model and following the SOLID and DRY principles, using [Jest](https://jestjs.io) for unit testing and JWT for access auth.<br />
 Greenrun-test is deployed in [Heroku](https://id.heroku.com/login) both the backend and the database, that is a [PostgreSQL](https://www.postgresql.org/) database, which is connected with the backend through [Prisma](https://www.prisma.io) as ORM tool.
 This App wass deployed automatically by CI/CD workflows (CI: GitHub Actions, CD: Heroku auto deployment), using the MASTER branch for it deploy, using too GitHub repo secrets.
 
