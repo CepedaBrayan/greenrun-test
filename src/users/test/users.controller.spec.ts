@@ -3,11 +3,23 @@ import { UsersController } from '../users.controller';
 import { UsersService } from '../users.service';
 import { CreateUserClientDto } from '../dto/create-user-client.dto';
 import { CreateUserAdminDto } from '../dto/create-user-admin.dto';
-import { BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { LoginUserDto } from '../dto/login-user.dto';
+import {
+  BadRequestException,
+  UnauthorizedException,
+  forwardRef,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import { hashPassword } from '../../utils/bcrypt';
+import { AuthModule } from '../../auth/auth.module';
+import { JwtService } from '@nestjs/jwt';
 
 //working on with real database - and after delete
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
+
+// starting JwtService
+const jwtService = new JwtService();
 
 const userClientExample: CreateUserClientDto = {
   first_name: 'John',
@@ -15,10 +27,9 @@ const userClientExample: CreateUserClientDto = {
   phone_number: '12345678',
   email: 'JohnDoe123@example.ex',
   username: 'JohnDoe123',
-  password: '12345678pass',
+  password: '',
   dni: 'example123',
 };
-
 const userAdminExample: CreateUserAdminDto = {
   auth_code: String(process.env.AUTH_CODE_CREATE_ADMIN),
   first_name: 'JohnAdmin2',
@@ -26,8 +37,14 @@ const userAdminExample: CreateUserAdminDto = {
   phone_number: '12345678',
   email: 'JohnDoeAdmin2@example.ex',
   username: 'JohnDoeAdmin2',
-  password: '12345678pass',
+  password: '',
   dni: 'example123Admin2',
+};
+
+// hashingExamples
+async () => {
+  userClientExample.password = await hashPassword('12345678pass');
+  userAdminExample.password = await hashPassword('12345678pass');
 };
 
 describe('UsersController', () => {
@@ -35,6 +52,7 @@ describe('UsersController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [forwardRef(() => AuthModule)],
       controllers: [UsersController],
       providers: [UsersService],
     }).compile();
@@ -56,7 +74,7 @@ describe('UsersController', () => {
           last_name: 'Doe',
           email: 'John2Doe2@mail.com',
           username: 'JohnDoe',
-          password: '123456',
+          password: await hashPassword('12345678'),
           dni: '123456789',
           user_state: 'active',
         },
@@ -77,7 +95,7 @@ describe('UsersController', () => {
           last_name: 'Doe',
           email: 'John2DoeAdmin@mail.com',
           username: 'JohnDoeAdmin',
-          password: '123456',
+          password: await hashPassword('12345678'),
           dni: '123456789admin',
           user_state: 'active',
         },
@@ -90,7 +108,7 @@ describe('UsersController', () => {
   });
 
   describe('users/clients', () => {
-    it('should create a user client', async () => {
+    it('should create an user client', async () => {
       const result = await controller.createClient(userClientExample);
       await prisma.user.delete({
         where: {
@@ -132,7 +150,7 @@ describe('UsersController', () => {
   });
 
   describe('users/admins', () => {
-    it('should create a user admin', async () => {
+    it('should create an user admin', async () => {
       const result = await controller.createAdmin(userAdminExample);
       await prisma.user.delete({
         where: {
@@ -142,7 +160,7 @@ describe('UsersController', () => {
       expect(result).toStrictEqual({ message: 'User admin created' });
     });
 
-    it('should return a unauthorized error if the auth code is wrong', async () => {
+    it('should return an unauthorized error if the auth code is wrong', async () => {
       const userAdminExample2: CreateUserAdminDto = userAdminExample;
       userAdminExample2.auth_code = 'wrongs';
       try {
@@ -179,6 +197,80 @@ describe('UsersController', () => {
         await controller.createClient(userAdminExample2);
       } catch (error) {
         expect(error).toBeInstanceOf(BadRequestException);
+      }
+    });
+  });
+
+  describe('users/login', () => {
+    it('should login an user client', async () => {
+      const loginUserDto: LoginUserDto = {
+        username: userClientExample.username,
+        password: userClientExample.password,
+      };
+      const result = await controller.login(loginUserDto);
+      expect(result.access_token).toBeDefined();
+    });
+    it('should unauthorized login an user client', async () => {
+      const loginUserDto: LoginUserDto = {
+        username: userClientExample.username,
+        password: 'wrongPassword',
+      };
+      try {
+        await controller.login(loginUserDto);
+      } catch (error) {
+        expect(error).toBeInstanceOf(UnauthorizedException);
+      }
+    });
+    it('should login an user admin', async () => {
+      const loginUserDto: LoginUserDto = {
+        username: userAdminExample.username,
+        password: userAdminExample.password,
+      };
+      const result = await controller.login(loginUserDto);
+      expect(result.access_token).toBeDefined();
+    });
+    it('should unauthorized login an user admin', async () => {
+      const loginUserDto: LoginUserDto = {
+        username: userAdminExample.username,
+        password: 'wrongPassword',
+      };
+      try {
+        await controller.login(loginUserDto);
+      } catch (error) {
+        expect(error).toBeInstanceOf(UnauthorizedException);
+      }
+    });
+  });
+
+  describe('users/profile', () => {
+    it('should return a profile for an user client', async () => {
+      const loginUserDto: LoginUserDto = {
+        username: userClientExample.username,
+        password: userClientExample.password,
+      };
+      const result = await controller.login(loginUserDto);
+      const decoded: any = jwtService.decode(result.access_token);
+      const payload = { user: { username: decoded.username } };
+      const profile: any = await controller.getProfile(payload);
+      expect(profile.username).toEqual(userClientExample.username);
+    });
+    it('should return a profile for an user admin', async () => {
+      const loginUserDto: LoginUserDto = {
+        username: userAdminExample.username,
+        password: userAdminExample.password,
+      };
+      const result = await controller.login(loginUserDto);
+      const decoded: any = jwtService.decode(result.access_token);
+      const payload = { user: { username: decoded.username } };
+      const profile: any = await controller.getProfile(payload);
+      expect(profile.username).toEqual(userAdminExample.username);
+    });
+    it('should unauthorized profile for an user', async () => {
+      const payload = { user: { username: 'wrong username' } };
+      try {
+        await controller.getProfile(payload);
+      } catch (error) {
+        expect(error).toBeInstanceOf(InternalServerErrorException);
       }
     });
   });
