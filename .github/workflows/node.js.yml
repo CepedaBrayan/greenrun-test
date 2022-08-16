@@ -36,4 +36,6 @@ jobs:
         env:
           POSTGRESQL_DATABASE_URL: ${{secrets.POSTGRESQL_DATABASE_URL}}
           AUTH_CODE_CREATE_ADMIN: ${{secrets.AUTH_CODE_CREATE_ADMIN}}
+          BCRYPT_SALT_ROUNDS: ${{secrets.BCRYPT_SALT_ROUNDS}}
+          JWT_SECRET_KEY: ${{secrets.JWT_SECRET_KEY}}
         run: npm ci && npm run build --if-present && npm test
