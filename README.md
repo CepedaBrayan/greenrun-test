@@ -97,9 +97,13 @@ And also there is a [Insomnia](https://insomnia.rest/) collection to test the AP
 
 ```bash
 # collection file
-root/Insomnia API/ Insomnia_2022-08-09.json
+root/Insomnia API/Insomnia_2022-08-09.json
 
 ```
+
+## Autor
+
+**_Brayan Rivera Cepeda - Ssr. fullstack web developer_**
 
 ## FRAMEWORK SOURCE: Stay in touch
 
